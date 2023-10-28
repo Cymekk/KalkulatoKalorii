@@ -1,0 +1,28 @@
+@tailwind base;
+*,
+*::after,
+*::before {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #262626;
+}
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+	.food-box {
+		@apply flex justify-between items-center mb-[16px];
+	}
+
+	.food-box-title {
+		@apply w-[40%] text-center font-semibold text-[18px];
+	}
+
+	.food-box-btn {
+		@apply p-[5px] bg-[#333333] rounded-md;
+	}
+}
