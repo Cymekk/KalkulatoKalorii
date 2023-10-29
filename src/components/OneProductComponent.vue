@@ -1,17 +1,27 @@
 <template>
-	<div class="product bg-[#ccc] p-[16px]">
+	<div
+		class="product-db p-[16px]"
+		:class="{ 'bg-[#ccc]': index / 2 == 0, 'bg-[#eee]': index / 2 !== 0 }">
 		<div class="product-header flex justify-between items-center mb-[16px]">
 			<div class="name">
 				<span class="font-semibold">{{ product.name }}</span>
 			</div>
 			<div class="buttons flex space-x-[6px]">
-				<button class="p-[5px] rounded-md bg-[#333333]">
+				<button
+					v-if="!fav"
+					class="p-[5px] rounded-md bg-[#333333]"
+					@click="addToFavourites(product)">
 					<img src="../assets/icons/heart.svg" alt="heart icon" />
 				</button>
-				<button class="p-[5px] rounded-md bg-[#333333] hidden">
+				<button
+					class="p-[5px] rounded-md bg-[#333333]"
+					v-if="fav"
+					@click="removeFavProduct()">
 					<img src="../assets/icons/heart-filled.svg" alt="heart filled icon" />
 				</button>
-				<button class="p-[5px] rounded-md bg-[#333333]" @click="showInfo(product.id)">
+				<button
+					class="p-[5px] rounded-md bg-[#333333]"
+					@click="isVisible = true">
 					<img src="../assets/icons/plus.svg" alt="plus icon" />
 				</button>
 			</div>
@@ -23,21 +33,49 @@
 			<div><span class="font-semibold">F:</span> {{ product.fats }}</div>
 		</div>
 	</div>
-	<AddEatenProductPopup :product="product" />
+	<AddEatenProductPopup :product="product" v-model="isVisible" />
 </template>
 
 <script setup>
-import AddEatenProductPopup from './AddEatenProductPopup.vue'
+//imports
+import { ref } from "vue"
+import AddEatenProductPopup from "./AddEatenProductPopup.vue"
+import { useStoreProducts } from "../store/storeProducts"
 
+//store
+const storeProducts = useStoreProducts()
+
+//props
 const props = defineProps({
 	product: {
 		type: Object,
 	},
+	fav: {
+		type: Boolean,
+	},
+	index: {
+		type: Number,
+	},
 })
 
-const showInfo = id => {
-	console.log(id)
+//emits
+const emit = defineEmits(["favProduct"])
+
+//variable for showing add eaten product popup
+const isVisible = ref(false)
+
+//add product to favourites
+const addToFavourites = product => {
+	storeProducts.addFavProduct(product)
+	emit("favProduct")
+}
+
+//remove fav product
+const removeFavProduct = () => {
+	storeProducts.removeFavProduct(props.product.id)
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>
