@@ -1,6 +1,6 @@
 <template>
 	<NavbarComponent />
-	<div class="container p-[32px] pt-0 text-[#d9d9d9] flex flex-col space-y-[16px]">
+	<div class="container max-w-[600px] p-[32px] pt-0 text-[#d9d9d9] flex flex-col space-y-[16px]">
 		<p>Thank you for choosing our apllication, We hope that our product will help you to reach your goals</p>
 		<p>At beginning we need to calculate your caloric need, you can choose between to options</p>
 

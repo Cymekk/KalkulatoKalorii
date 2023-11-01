@@ -1,6 +1,6 @@
 <template>
 	<div class="w-full h-[100svh] flex items-center justify-center">
-		<div class="logo flex items-center absolute top-0 left-0 p-[32px]">
+		<div class="logo flex items-center md:justify-center absolute top-0 left-0 p-[32px] w-full">
 			<img src="../assets/icons/calculator.svg" alt="Calculator icon" />
 			<h1 class="text-[#D9D9D9] font-bold text-[24px] ml-[12px]">Calories Calculator</h1>
 		</div>
@@ -23,7 +23,7 @@
 				>
 			</div>
 
-			<div class="inputs mt-[32px] flex flex-col items-center">
+			<form @submit.prevent="validateForm" class="inputs mt-[32px] flex flex-col items-center">
 				<!-- email input -->
 				<div
 					class="input-box relative border-b-2 border-[#D9D9D9] w-full"
@@ -66,14 +66,14 @@
 					>Password is required, min length is 7 characters</span
 				>
 
-				<button
+				<input
+					type="submit"
 					class="bg-[#333333] px-6 py-3 font-semibold rounded-md hover:bg-[#d9d9d9] hover:text-[#333333] transition-colors duration-500"
-					@click="validateForm"
-				>
-					{{ title }}
-				</button>
+					:value="title"
+				/>
+
 				<span class="mt-[24px] text-[#EF4444] text-center" v-if="storeAuth.error">{{ error }}</span>
-			</div>
+			</form>
 		</div>
 	</div>
 </template>
@@ -134,10 +134,8 @@ const checkPasswordInput = () => {
 const handleLoginRegisterForm = () => {
 	if (!register.value) {
 		storeAuth.registerUser(credentials)
-		console.log('rejestracja')
 	} else {
 		storeAuth.login(credentials)
-		console.log('logowanie')
 	}
 }
 

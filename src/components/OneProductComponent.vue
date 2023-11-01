@@ -1,7 +1,5 @@
 <template>
-	<div
-		class="product-db p-[16px]"
-		:class="{ 'bg-[#ccc]': index / 2 == 0, 'bg-[#eee]': index / 2 !== 0 }">
+	<div class="product-db p-[16px]" :class="{ 'bg-[#ccc]': index % 2 == 0, 'bg-[#eee]': index % 2 !== 0 }">
 		<div class="product-header flex justify-between items-center mb-[16px]">
 			<div class="name">
 				<span class="font-semibold">{{ product.name }}</span>
@@ -10,18 +8,15 @@
 				<button
 					v-if="!fav"
 					class="p-[5px] rounded-md bg-[#333333]"
-					@click="addToFavourites(product)">
+					:class="{ hidden: favProduct.length !== 0 }"
+					@click="addToFavourites(product)"
+				>
 					<img src="../assets/icons/heart.svg" alt="heart icon" />
 				</button>
-				<button
-					class="p-[5px] rounded-md bg-[#333333]"
-					v-if="fav"
-					@click="removeFavProduct()">
+				<button v-if="fav" class="p-[5px] rounded-md bg-[#333333]" @click="removeFavProduct()">
 					<img src="../assets/icons/heart-filled.svg" alt="heart filled icon" />
 				</button>
-				<button
-					class="p-[5px] rounded-md bg-[#333333]"
-					@click="isVisible = true">
+				<button class="p-[5px] rounded-md bg-[#333333]" @click="isVisible = true">
 					<img src="../assets/icons/plus.svg" alt="plus icon" />
 				</button>
 			</div>
@@ -38,9 +33,9 @@
 
 <script setup>
 //imports
-import { ref } from "vue"
-import AddEatenProductPopup from "./AddEatenProductPopup.vue"
-import { useStoreProducts } from "../store/storeProducts"
+import { ref, computed, onMounted } from 'vue'
+import AddEatenProductPopup from './AddEatenProductPopup.vue'
+import { useStoreProducts } from '../store/storeProducts'
 
 //store
 const storeProducts = useStoreProducts()
@@ -50,16 +45,19 @@ const props = defineProps({
 	product: {
 		type: Object,
 	},
+	index: {
+		type: Number,
+	},
 	fav: {
 		type: Boolean,
 	},
-	index: {
-		type: Number,
+	favProducts: {
+		type: Array,
 	},
 })
 
 //emits
-const emit = defineEmits(["favProduct"])
+const emit = defineEmits(['favProduct'])
 
 //variable for showing add eaten product popup
 const isVisible = ref(false)
@@ -67,15 +65,19 @@ const isVisible = ref(false)
 //add product to favourites
 const addToFavourites = product => {
 	storeProducts.addFavProduct(product)
-	emit("favProduct")
+	emit('favProduct')
 }
 
 //remove fav product
 const removeFavProduct = () => {
 	storeProducts.removeFavProduct(props.product.id)
 }
+
+const favProducts = computed(() => {
+	return storeProducts.favProducts
+})
+
+const favProduct = favProducts.value.filter(el => el.uuid == props.product.uuid)
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

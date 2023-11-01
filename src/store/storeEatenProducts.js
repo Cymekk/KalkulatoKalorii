@@ -1,5 +1,5 @@
-import { defineStore } from "pinia"
-import { db } from "../firebase/index.js"
+import { defineStore } from 'pinia'
+import { db } from '../firebase/index.js'
 import {
 	doc,
 	collection,
@@ -9,43 +9,42 @@ import {
 	QuerySnapshot,
 	orderBy,
 	deleteDoc,
-} from "firebase/firestore"
-import { useStoreAuth } from "../store/storeAuth.js"
-import { useNow, useDateFormat } from "@vueuse/core"
+	updateDoc,
+} from 'firebase/firestore'
+import { useStoreAuth } from '../store/storeAuth.js'
+import { useNow, useDateFormat } from '@vueuse/core'
 
 let eatenFoodCollectionRef
 let storeAuth
 let formatted
+let getEatenProductsSnapshot
 
-export const useEatenProducts = defineStore("storeEatenProducts", {
+export const useEatenProducts = defineStore('storeEatenProducts', {
 	state: () => {
 		return {
 			eatenProducts: [],
-			whichMeal: "",
+			whichMeal: '',
 			breakfestBox: false,
 			lunchBox: false,
 			snackBox: false,
 			dinnerBox: false,
 			isLoaded: false,
+			testAccountProducts: [],
 		}
 	},
 	actions: {
 		init() {
 			storeAuth = useStoreAuth()
-			eatenFoodCollectionRef = collection(
-				db,
-				"eatenProducts",
-				storeAuth.user.id,
-				"eatenFood"
-			)
-			formatted = useDateFormat(useNow(), "YYYY-MM-DD")
+			eatenFoodCollectionRef = collection(db, 'eatenProducts', storeAuth.user.id, 'eatenFood')
+			formatted = useDateFormat(useNow(), 'YYYY-MM-DD')
 			this.getEatenProducts(formatted.value)
 		},
 
-		async getEatenProducts(date) {
+		getEatenProducts(date) {
 			const q = query(eatenFoodCollectionRef)
-			onSnapshot(q, querySnapshot => {
+			getEatenProductsSnapshot = onSnapshot(q, querySnapshot => {
 				let foodArray = []
+				this.testAccountProducts = []
 				querySnapshot.forEach(doc => {
 					let food = {
 						id: doc.id,
@@ -60,6 +59,9 @@ export const useEatenProducts = defineStore("storeEatenProducts", {
 						weight: doc.data().weight,
 					}
 
+					if (storeAuth.testAccount) {
+						this.testAccountProducts.push(doc.id)
+					}
 					foodArray.unshift(food)
 					this.isLoaded = true
 				})
@@ -67,6 +69,14 @@ export const useEatenProducts = defineStore("storeEatenProducts", {
 					this.eatenProducts = foodArray.filter(el => el.date == date)
 				}
 			})
+		},
+
+		clearEatenProducts() {
+			this.testAccountProducts = []
+			this.eatenProducts = []
+			if (getEatenProductsSnapshot) {
+				getEatenProductsSnapshot()
+			}
 		},
 
 		async addEatenProduct(productInfo, weight) {
@@ -81,13 +91,27 @@ export const useEatenProducts = defineStore("storeEatenProducts", {
 				uid: productInfo.id,
 				weight: weight,
 			})
-			this.router.push("/")
+			this.router.push('/')
+		},
+
+		async editEatenProduct(product, weight, id) {
+			await updateDoc(doc(db, 'eatenProducts', storeAuth.user.id, 'eatenFood', id), {
+				calories: product.calories * (weight / 100),
+				carbs: product.carbs * (weight / 100),
+				proteins: product.proteins * (weight / 100),
+				fats: product.fats * (weight / 100),
+				weight: weight,
+			})
 		},
 
 		async removeEatenProduct(id) {
-			await deleteDoc(
-				doc(db, "eatenProducts", storeAuth.user.id, "eatenFood", id)
-			)
+			await deleteDoc(doc(db, 'eatenProducts', storeAuth.user.id, 'eatenFood', id))
+		},
+
+		removeTestProducts() {
+			this.testAccountProducts.forEach(el => {
+				deleteDoc(doc(db, 'eatenProducts', storeAuth.user.id, 'eatenFood', el))
+			})
 		},
 
 		assignMeal(meal) {
@@ -113,22 +137,20 @@ export const useEatenProducts = defineStore("storeEatenProducts", {
 
 	getters: {
 		Breakfest() {
-			return this.eatenProducts.filter(el => el.meal == "Breakfest")
+			return this.eatenProducts.filter(el => el.meal == 'Breakfest')
 		},
 		Lunch() {
-			return this.eatenProducts.filter(el => el.meal == "Lunch")
+			return this.eatenProducts.filter(el => el.meal == 'Lunch')
 		},
 		Snacks() {
-			return this.eatenProducts.filter(el => el.meal == "Snacks")
+			return this.eatenProducts.filter(el => el.meal == 'Snacks')
 		},
 		Dinner() {
-			return this.eatenProducts.filter(el => el.meal == "Dinner")
+			return this.eatenProducts.filter(el => el.meal == 'Dinner')
 		},
 		TotalCalories() {
 			let totalCalories = 0
-			this.eatenProducts.forEach(
-				el => (totalCalories += parseFloat(el.calories))
-			)
+			this.eatenProducts.forEach(el => (totalCalories += parseFloat(el.calories)))
 
 			return totalCalories
 		},
@@ -140,9 +162,7 @@ export const useEatenProducts = defineStore("storeEatenProducts", {
 		},
 		TotalProteins() {
 			let totalProteins = 0
-			this.eatenProducts.forEach(
-				el => (totalProteins += parseFloat(el.proteins))
-			)
+			this.eatenProducts.forEach(el => (totalProteins += parseFloat(el.proteins)))
 			return totalProteins
 		},
 		TotalFats() {

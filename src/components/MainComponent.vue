@@ -1,7 +1,6 @@
 <template>
-	<main class="main container p-[32px] pt-0">
-		<div
-			class="products-container bg-[#d9d9d9] p-[16px] rounded-md max-h-[60vh] overflow-y-scroll">
+	<main class="main container max-w-[600px] p-[32px] pt-0">
+		<div class="products-container bg-[#d9d9d9] p-[16px] rounded-md max-h-[50vh] overflow-y-scroll">
 			<CalendarComponent @send-date="showDate" />
 
 			<!-- Breakfest box -->
@@ -9,7 +8,8 @@
 				<button
 					class="food-box-btn transition-transform duration-500"
 					:class="{ 'rotate-180': eatenProducts.breakfestBox }"
-					@click="eatenProducts.showBreakfestBox">
+					@click="eatenProducts.showBreakfestBox"
+				>
 					<img src="../assets/icons/chevron-down.svg" alt="chevron down icon" />
 				</button>
 				<h3 class="food-box-title">Breakfest</h3>
@@ -18,14 +18,13 @@
 					<img src="../assets/icons/plus.svg" alt="plus icon" />
 				</button>
 			</div>
-			<div
-				class="mb-[16px]"
-				v-if="eatenProducts.breakfestBox">
+			<div class="mb-[16px]" v-if="eatenProducts.breakfestBox">
 				<EatenProductComponent
 					v-for="(item, index) in eatenProducts.Breakfest"
 					:key="item.id"
 					:product="item"
-					:index="index" />
+					:index="index"
+				/>
 			</div>
 			<span
 				class="mb-[16px] block text-center text-red-500 font-semibold"
@@ -38,7 +37,8 @@
 				<button
 					class="food-box-btn transition-transform duration-500"
 					:class="{ 'rotate-180': eatenProducts.lunchBox }"
-					@click="eatenProducts.showLunchBox">
+					@click="eatenProducts.showLunchBox"
+				>
 					<img src="../assets/icons/chevron-down.svg" alt="chevron down icon" />
 				</button>
 				<h3 class="food-box-title">Lunch</h3>
@@ -52,7 +52,8 @@
 					v-for="(item, index) in eatenProducts.Lunch"
 					:key="item.id"
 					:product="item"
-					:index="index" />
+					:index="index"
+				/>
 			</div>
 
 			<span
@@ -66,7 +67,8 @@
 				<button
 					class="food-box-btn transition-transform duration-500"
 					:class="{ 'rotate-180': eatenProducts.snackBox }"
-					@click="eatenProducts.showSnacksBox">
+					@click="eatenProducts.showSnacksBox"
+				>
 					<img src="../assets/icons/chevron-down.svg" alt="chevron down icon" />
 				</button>
 				<h3 class="food-box-title">Snacks</h3>
@@ -80,7 +82,8 @@
 					v-for="(item, index) in eatenProducts.Snacks"
 					:key="item.id"
 					:product="item"
-					:index="index" />
+					:index="index"
+				/>
 			</div>
 			<span
 				class="mb-[16px] block text-center text-red-500 font-semibold"
@@ -93,7 +96,8 @@
 				<button
 					class="food-box-btn transition-transform duration-500"
 					:class="{ 'rotate-180': eatenProducts.dinnerBox }"
-					@click="eatenProducts.showDinnerBox">
+					@click="eatenProducts.showDinnerBox"
+				>
 					<img src="../assets/icons/chevron-down.svg" alt="chevron down icon" />
 				</button>
 				<h3 class="food-box-title">Dinner</h3>
@@ -107,7 +111,8 @@
 					v-for="(item, index) in eatenProducts.Dinner"
 					:key="item.id"
 					:product="item"
-					:index="index" />
+					:index="index"
+				/>
 			</div>
 			<span
 				class="mb-[16px] block text-center text-red-500 font-semibold"
@@ -116,18 +121,22 @@
 			>
 		</div>
 	</main>
+	<AlertComponent v-if="isError" />
 </template>
 
 <script setup>
 //imports
-import { ref, watch } from "vue"
-import CalendarComponent from "./CalendarComponent.vue"
-import EatenProductComponent from "./EatenProductComponent.vue"
-import { useRouter } from "vue-router"
-import { useEatenProducts } from "../store/storeEatenProducts"
+import { onMounted, ref } from 'vue'
+import CalendarComponent from './CalendarComponent.vue'
+import EatenProductComponent from './EatenProductComponent.vue'
+import { useRouter } from 'vue-router'
+import { useEatenProducts } from '../store/storeEatenProducts'
+import { useStoreCalories } from '../store/storeCalories'
+import AlertComponent from './AlertComponent.vue'
 
 //store
 const eatenProducts = useEatenProducts()
+const storeCalories = useStoreCalories()
 
 //router
 const router = useRouter()
@@ -141,13 +150,35 @@ function showDate(date) {
 	eatenProducts.getEatenProducts(todayDate.value)
 }
 
+//checking that you calculate you caloric need first
+const isError = ref(false)
+const isTotalCalories = ref(false)
+
+const checkTotalCalories = () => {
+	if (storeCalories.calories.totalCalories === 0) {
+		isTotalCalories.value = true
+	} else {
+		isTotalCalories.value = false
+	}
+}
+
 //navigate to add product view and storing for which meal you will add product
 const goToAddProduct = e => {
-	const parentElement = e.target.parentElement.parentElement
-	const headerText = parentElement.querySelector("h3").textContent
-	eatenProducts.assignMeal(headerText)
-	router.push("/addproduct")
+	checkTotalCalories()
+	if (isTotalCalories.value) {
+		isError.value = true
+	} else {
+		isError.value = false
+		const parentElement = e.target.parentElement.parentElement
+		const headerText = parentElement.querySelector('h3').textContent
+		eatenProducts.assignMeal(headerText)
+		router.push('/addproduct')
+	}
 }
+
+onMounted(() => {
+	storeCalories.getCaloriesFromDb()
+})
 </script>
 
 <style lang="scss" scoped>

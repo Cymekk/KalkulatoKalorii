@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { db } from '../firebase/index.js'
-import { doc, setDoc, getDoc } from 'firebase/firestore'
+import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore'
 import { useStoreAuth } from './storeAuth'
 
 export const useStoreCalories = defineStore('storeCalories', {
@@ -12,6 +12,7 @@ export const useStoreCalories = defineStore('storeCalories', {
 				proteinsCalories: 0,
 				fatsCalories: 0,
 			},
+			isLoaded: false,
 		}
 	},
 	actions: {
@@ -73,6 +74,11 @@ export const useStoreCalories = defineStore('storeCalories', {
 					(this.calories.proteinsCalories = docSnap.data().proteinsCalories),
 					(this.calories.fatsCalories = docSnap.data().fatsCalories)
 			}
+			this.isLoaded = true
+		},
+
+		async deleteTestCalories() {
+			await deleteDoc(doc(db, 'calories', 'FE7woJP1jxTpnsnzGbW2B2HZB083'))
 		},
 	},
 })

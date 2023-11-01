@@ -1,12 +1,12 @@
-const plugin = require("tailwindcss/plugin")
+const plugin = require('tailwindcss/plugin')
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+	content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ["Roboto", "sans-serif"],
+				sans: ['Roboto', 'sans-serif'],
 			},
 		},
 		container: {
@@ -15,12 +15,8 @@ module.exports = {
 	},
 	plugins: [
 		plugin(function ({ addVariant }) {
-			addVariant("progress-unfilled", ["&::-webkit-progress-bar", "&"])
-			addVariant("progress-filled", [
-				"&::-webkit-progress-value",
-				"&::-moz-progress-bar",
-				"&",
-			])
+			addVariant('progress-unfilled', ['&::-webkit-progress-bar', '&'])
+			addVariant('progress-filled', ['&::-webkit-progress-value', '&::-moz-progress-bar', '&'])
 		}),
 	],
 }

@@ -3,6 +3,7 @@ import AuthView from '../views/AuthView.vue'
 import HomeView from '../views/HomeView.vue'
 import CalcCaloriesView from '../views/CalcCaloriesView.vue'
 import AddProductView from '../views/AddProductView.vue'
+import TrackersView from '../views/TrackersView.vue'
 import { useStoreAuth } from '../store/storeAuth'
 
 const router = createRouter({
@@ -27,6 +28,11 @@ const router = createRouter({
 			path: '/addproduct',
 			name: 'addproductview',
 			component: AddProductView,
+		},
+		{
+			path: '/trackers',
+			name: 'trackersview',
+			component: TrackersView,
 		},
 	],
 })

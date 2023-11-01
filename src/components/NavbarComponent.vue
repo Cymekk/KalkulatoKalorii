@@ -1,8 +1,8 @@
 <template>
-	<nav class="nav container p-[32px] flex items-center justify-between">
+	<nav class="nav container max-w-[600px] p-[32px] flex items-center justify-between">
 		<img src="../assets/icons/calculator.svg" alt="" />
 		<h2 class="text-[#D9D9D9] text-[28px] text-center">Calories Calculator</h2>
-		<div class="burger-btn w-[40px] h-[40px] flex flex-col justify-between" @click="showNav()">
+		<div class="burger-btn w-[40px] h-[40px] flex flex-col justify-between cursor-pointer" @click="showNav()">
 			<span class="bar h-[3px] bg-[#D9D9D9] w-full"></span>
 			<span class="bar h-[3px] bg-[#D9D9D9] w-full"></span>
 			<span class="bar h-[3px] bg-[#D9D9D9] w-full"></span>
