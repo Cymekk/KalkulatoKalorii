@@ -15,6 +15,10 @@ Stack in this project:
 Application link:
 https://kalkulatorkalorii-7b44e.web.app/
 
+credentials for test account:
+- login: test@test.com  
+- password: test123
+
 ## Some screens from application
 
 <p align="center">Auth View</p>
